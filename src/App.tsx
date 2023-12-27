@@ -1,25 +1,29 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import '@elastic/eui/dist/eui_theme_dark.css';
+import '@elastic/eui/dist/eui_theme_light.css';
+import { EuiProvider, EuiText, EuiThemeColorMode } from '@elastic/eui';
+import { useState } from 'react';
+import { Route, Routes } from 'react-router-dom';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
 
 function App() {
+  const [mode, setMode] = useState<EuiThemeColorMode | undefined>('dark');
+  const changeMode = () => {
+    if (mode === 'dark') {
+      setMode('light');
+    } else {
+      setMode('dark');
+    }
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <EuiProvider colorMode={mode}>
+      <Routes>
+        <Route path='/login' element={<Login />} />
+        <Route path='/' element={<Dashboard />} />
+        <Route path='*' element={<Dashboard />} />
+      </Routes>
+    </EuiProvider>
   );
 }
 
