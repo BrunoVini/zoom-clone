@@ -13,18 +13,18 @@ type PropsType = {
   onClick: React.MouseEventHandler<HTMLButtonElement>;
 };
 
-export const Header = (props: PropsType) => {
+export const Header = () => {
   return (
     <EuiHeader>
       <EuiHeaderSectionItem>
-        <EuiHeaderLogo>Elastic</EuiHeaderLogo>
+        <EuiHeaderLogo>Zoom</EuiHeaderLogo>
       </EuiHeaderSectionItem>
       <EuiHeaderSectionItem>
         <EuiHeaderLinks aria-label="App navigation links example">
           <EuiHeaderLink isActive>Docs</EuiHeaderLink>
           <EuiHeaderLink href='/'>Code</EuiHeaderLink>
           <EuiHeaderLink iconType="help">Help</EuiHeaderLink>
-          <EuiButton fill {...props} >Mode</EuiButton>
+          <EuiButton fill >Mode</EuiButton>
         </EuiHeaderLinks>
       </EuiHeaderSectionItem>
     </EuiHeader>

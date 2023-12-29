@@ -1,24 +1,42 @@
 import { EuiButton, EuiFlexGroup, EuiFlexItem, EuiImage, EuiPanel, EuiProvider, EuiSpacer, EuiText, EuiTextColor } from '@elastic/eui';
-import { useState } from 'react';
 import animation from '../assets/animation.gif';
 import logo from '../assets/logo.png';
+import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup } from 'firebase/auth';
+import { firebaseAuth, userRef } from '../utils/FirebaseConfig';
+import { addDoc, getDocs, query, where } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
+import { useAppDispatch } from '../app/hooks';
+import { setUser } from '../app/slices/AuthSlice';
 
 const Login: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
-  const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(event.target.value);
-  };
+  onAuthStateChanged(firebaseAuth, (currentUser) => {
+    if (currentUser) navigate("/");
+  });
 
-  const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(event.target.value);
-  };
+  const login = async () => {
+    const provider = new GoogleAuthProvider();
+    const {
+      user: { displayName, email, uid }
+    } = await signInWithPopup(firebaseAuth, provider);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    // Add your login logic here
-  };
+    if (email) {
+      const firestoreQuery = query(userRef, where("uid", "==", uid));
+      const fetchUsers = await getDocs(firestoreQuery);
+      if (fetchUsers.docs.length === 0) {
+        await addDoc(userRef, {
+          uid,
+          name: displayName,
+          email
+        })
+      }
+    }
+
+    dispatch(setUser({ uid, name: displayName, email }));
+    navigate("/");
+  }
 
   return (
     <EuiProvider colorMode='dark'>
@@ -44,7 +62,7 @@ const Login: React.FC = () => {
                   </h3>
                 </EuiText>
                 <EuiSpacer size='l' />
-                <EuiButton fill>
+                <EuiButton fill onClick={login}>
                   Login with Google
                 </EuiButton>
               </EuiFlexItem>
